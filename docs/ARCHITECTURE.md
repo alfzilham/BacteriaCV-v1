@@ -88,6 +88,11 @@ At the training stage, the target label is taken from the lookup table [L] befor
 ### C7. Web Interface
 - Upload an image, run inference, display the result and visualization.
 - Backend: FastAPI. Frontend: a single HTML page.
+- The web layer follows MVC. The Model is the `bacteriacv` package, the View is
+  `app/views/` (template and static assets), and the Controller is
+  `app/controllers/` with the logic between them in `app/services/`.
+  The checkpoint is loaded once at startup in `app/core/lifespan.py`.
+  Routes, status codes, and JSON fields are unchanged by this split.
 
 ## 3. Data Flow
 
@@ -127,12 +132,22 @@ BacteriaCV/
 │       ├── download.py               # download archives + SHA-256 manifest
 │       ├── extract.py                # extraction per species + verification
 │       └── build_index.py            # index.csv + leakage check
-├── app/
-│   ├── main.py                       # C7 backend
-│   └── static/
-│       ├── index.html                # C7 frontend, markup only
-│       ├── main.css                  # styles, industrial brutalist
-│       └── main.js                   # interaction and API calls
+├── app/                              # C7, web layer as MVC
+│   ├── main.py                       # create_app, mounts static, includes routers
+│   ├── core/
+│   │   └── lifespan.py               # AppState, checkpoint loaded once
+│   ├── controllers/                  # Controller: HTTP only
+│   │   ├── page_controller.py        # GET /
+│   │   └── api_controller.py         # /api/health, /api/predict, /api/report
+│   ├── services/
+│   │   └── prediction_service.py     # upload validation, decoding, response payload
+│   └── views/                        # View
+│       ├── templates/
+│       │   └── index.html            # markup only
+│       └── static/
+│           ├── main.css              # styles
+│           ├── main.js               # interaction and API calls
+│           └── i18n.js               # EN and ID dictionaries
 ├── data/
 │   ├── raw/
 │   │   ├── zips/                     # original ZIP archives
@@ -142,7 +157,8 @@ BacteriaCV/
 │   ├── index.csv                     # path, species, split, fold
 │   └── features/                     # backbone feature cache, derived artifacts
 ├── checkpoints/                      # heads.pt, training_report.json, evaluation.json
-├── docs/                             # SPEC, ARCHITECTURE, DESIGN, PRD, CONTEXT
+├── docs/                             # SPEC, ARCHITECTURE, DESIGN, PRD, CONTEXT, WORKFLOW
+├── samples/                          # four sample PNG images for the demo
 ├── scripts/                          # setup_env.ps1, check_env.ps1
 ├── tests/
 └── AGENTS.md
@@ -162,6 +178,7 @@ The structure uses a `bacteriacv` package with the `bacteriacv.` entry point. Th
 | A7 | Folds only within train data | Validation data must stay free of training data so early stopping is not biased |
 | A8 | Species names kept in one table | Six DIBaS archive names are misspelled, two archives refer to the same taxonomic species |
 | A9 | SHA-256 of each archive recorded | The source server uses an expired TLS certificate, so integrity is proven through hashes |
+| A10 | MVC for the web layer only | `bacteriacv` stays the Model so its imports and CLI commands (`python -m bacteriacv...`) do not change; the web layer is split into controllers, services, and views |
 
 ## 6. Extension Points
 - Full fine-tuning: unfreeze the backbone in `model.py`.
