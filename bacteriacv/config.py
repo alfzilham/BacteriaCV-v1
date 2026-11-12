@@ -115,7 +115,9 @@ MIN_DELTA = 1e-4
 FEATURES_DIR = PROJECT_ROOT / "data" / "features"
 CHECKPOINT_DIR = PROJECT_ROOT / "checkpoints"
 APP_DIR = PROJECT_ROOT / "app"
-STATIC_DIR = APP_DIR / "static"
+VIEWS_DIR = APP_DIR / "views"
+STATIC_DIR = VIEWS_DIR / "static"
+TEMPLATES_DIR = VIEWS_DIR / "templates"
 
 # ---------------------------------------------------------------------
 # Web interface

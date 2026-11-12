@@ -24,6 +24,15 @@ BacteriaCV/
 │       ├── download.py
 │       ├── extract.py
 │       └── build_index.py
+├── app/                      # web layer, MVC
+│   ├── main.py               # create_app, entry point app.main:app
+│   ├── core/lifespan.py      # checkpoint loaded once at startup
+│   ├── controllers/          # HTTP routes (page, api)
+│   ├── services/             # upload validation, decoding, response
+│   └── views/
+│       ├── templates/        # index.html
+│       └── static/           # main.css, main.js, i18n.js, icons
+├── samples/                  # four sample PNG images for the demo
 ├── data/
 │   ├── index.csv
 │   └── raw/
@@ -118,10 +127,10 @@ Tests cover species mapping, data locations, downloading, extraction, dataset sp
 
 ## Documentation
 
-- [SPEC](docs/SPEC.md) — source of truth for project requirements.
-- [ARCHITECTURE](docs/ARCHITECTURE.md) — architecture and technical decisions.
-- [DESIGN](docs/DESIGN.md) — interface design and module contracts.
-- [AGENT](AGENTS.md) — contribution and audit rules.
+- [SPEC](docs/SPEC.md): source of truth for project requirements.
+- [ARCHITECTURE](docs/ARCHITECTURE.md): architecture and technical decisions.
+- [DESIGN](docs/DESIGN.md): interface design and module contracts.
+- [AGENT](AGENTS.md): contribution and audit rules.
 
 ## Running the online version
 
@@ -133,13 +142,13 @@ https://bacteriacv-demo.up.railway.app
 
 Upload images in png, jpg, jpeg, tif, or tiff format with a 20 MB limit. A health check is available at `/api/health` and the model evaluation report at `/api/report`.
 
-To try it without preparing your own images, the `docs/contoh/` folder holds four tested PNG images at 768 x 574 that can be uploaded directly to the upload field.
+To try it without preparing your own images, the `samples/` folder holds four tested PNG images at 768 x 574 that can be uploaded directly to the upload field.
 
 The sample images are derived from the DIBaS dataset (Zielinski et al. 2017, PLOS ONE 12(9):e0184554), reduced to 768 x 574 for demonstration purposes. The Gram status the platform reports for a sample image may differ from the result on the original image because of the scale difference.
 
 ## Additional image data
 
-Besides the four sample images in `docs/contoh/`, a more complete set of images and archives is available on Google Drive:
+Besides the four sample images in `samples/`, a more complete set of images and archives is available on Google Drive:
 
 ```text
 https://drive.google.com/drive/folders/1dSyJUjPfyzu5GrCnH1LWZ_qRRSmnviA_?usp=drive_link

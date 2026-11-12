@@ -96,7 +96,13 @@ def test_paths_are_inside_project() -> None:
     """Every output folder must sit inside the project root."""
     from bacteriacv.paths import PROJECT_ROOT
 
-    for path in (config.FEATURES_DIR, config.CHECKPOINT_DIR, config.APP_DIR, config.STATIC_DIR):
+    for path in (
+        config.FEATURES_DIR,
+        config.CHECKPOINT_DIR,
+        config.APP_DIR,
+        config.STATIC_DIR,
+        config.TEMPLATES_DIR,
+    ):
         assert path.is_relative_to(PROJECT_ROOT), path
 
 
