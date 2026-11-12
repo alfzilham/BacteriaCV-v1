@@ -24,7 +24,9 @@ GOOD_IMAGE = "citra.png"
 BAD_SUFFIX = "catatan.txt"
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-STATIC_DIR = REPO_ROOT / "app" / "static"
+STATIC_DIR = REPO_ROOT / "app" / "views" / "static"
+TEMPLATES_DIR = REPO_ROOT / "app" / "views" / "templates"
+APP_PY_FILES = sorted((REPO_ROOT / "app").rglob("*.py"))
 
 
 def _png_bytes(dark: bool = True) -> bytes:
@@ -244,9 +246,9 @@ def test_predict_is_deterministic(client: TestClient) -> None:
 
 def test_report_returns_404_before_evaluation(client: TestClient, monkeypatch) -> None:
     """A missing report must give 404, not a server error."""
-    import app.main as app_module
+    import app.controllers.api_controller as api_module
 
-    monkeypatch.setattr(app_module, "CHECKPOINT_DIR", REPO_ROOT / "tidak_ada")
+    monkeypatch.setattr(api_module, "CHECKPOINT_DIR", REPO_ROOT / "tidak_ada")
 
     response = client.get("/api/report")
 
@@ -259,10 +261,10 @@ def test_report_returns_evaluation_file(
     """The evaluation report must be served as it stands."""
     import json
 
-    import app.main as app_module
+    import app.controllers.api_controller as api_module
 
-    monkeypatch.setattr(app_module, "CHECKPOINT_DIR", tmp_path)
-    (tmp_path / app_module.EVALUATION_NAME).write_text(
+    monkeypatch.setattr(api_module, "CHECKPOINT_DIR", tmp_path)
+    (tmp_path / api_module.EVALUATION_NAME).write_text(
         json.dumps({"shape": {"f1_macro": 0.9}}), encoding="utf-8"
     )
 
@@ -281,7 +283,7 @@ def test_index_html_has_one_panel_with_toggle() -> None:
     The file must have exactly one img element for the panel and one toggle
     container. Five img elements would break the one panel design.
     """
-    page = (REPO_ROOT / "app" / "static" / "index.html").read_text(encoding="utf-8")
+    page = (TEMPLATES_DIR / "index.html").read_text(encoding="utf-8")
 
     # The brand logo also uses <img> and is not a panel, so what is counted
     # is the img elements other than the logo. The count must still be one.
@@ -309,16 +311,16 @@ def test_static_css_and_js_are_external_files() -> None:
     renders with no styling and no interaction, and no existing test would
     fail because of it.
     """
-    static_dir = REPO_ROOT / "app" / "static"
+    static_dir = STATIC_DIR
     css = static_dir / "main.css"
     js = static_dir / "main.js"
 
-    assert css.is_file(), "app/static/main.css tidak ada"
-    assert js.is_file(), "app/static/main.js tidak ada"
-    assert css.stat().st_size > 0, "app/static/main.css kosong"
-    assert js.stat().st_size > 0, "app/static/main.js kosong"
+    assert css.is_file(), "app/views/static/main.css tidak ada"
+    assert js.is_file(), "app/views/static/main.js tidak ada"
+    assert css.stat().st_size > 0, "app/views/static/main.css kosong"
+    assert js.stat().st_size > 0, "app/views/static/main.js kosong"
 
-    page = (static_dir / "index.html").read_text(encoding="utf-8")
+    page = (TEMPLATES_DIR / "index.html").read_text(encoding="utf-8")
 
     assert '<link rel="stylesheet" href="/static/main.css">' in page
     assert '<script src="/static/main.js" defer></script>' in page
@@ -432,7 +434,7 @@ def test_scrollbar_track_has_visible_delimiter() -> None:
     darkened later as a legitimate alternative, only the delimiter changes;
     what stays required is that the track has a visible delimiter.
     """
-    css = (REPO_ROOT / "app" / "static" / "main.css").read_text(encoding="utf-8")
+    css = (STATIC_DIR / "main.css").read_text(encoding="utf-8")
 
     track = _declared_background(css, "::-webkit-scrollbar-track")
 
@@ -476,7 +478,7 @@ def test_webkit_scrollbar_contrast_is_enforced() -> None:
       scrollbar-color #050505 #EAE8E3, track #EAE8E3, thumb #050505,
       hover #D31515.
     """
-    css = (REPO_ROOT / "app" / "static" / "main.css").read_text(encoding="utf-8")
+    css = (STATIC_DIR / "main.css").read_text(encoding="utf-8")
 
     # 1. the scrollbar-color property on the html block
     html_block = re.search(r"\bhtml\s*\{([^}]*)\}", css)
@@ -542,7 +544,7 @@ def test_hidden_attribute_beats_dialog_backdrop_display() -> None:
     display: none !important, and that rule must appear before
     .dialog-backdrop.
     """
-    css = (REPO_ROOT / "app" / "static" / "main.css").read_text(encoding="utf-8")
+    css = (STATIC_DIR / "main.css").read_text(encoding="utf-8")
 
     rule = re.search(r"\[hidden\]\s*\{[^}]*\}", css)
     assert rule, "aturan [hidden] tidak ada di main.css"
@@ -570,7 +572,7 @@ def test_index_html_has_no_hardcoded_metric_claims() -> None:
     The figures on the page must come from the server response, not be written
     into the markup, so a model change cannot leave a stale claim behind.
     """
-    page = (REPO_ROOT / "app" / "static" / "index.html").read_text(encoding="utf-8")
+    page = (TEMPLATES_DIR / "index.html").read_text(encoding="utf-8")
 
     for claim in ("95%", "99%", "akurasi 9"):
         assert claim not in page
@@ -582,10 +584,11 @@ def test_app_module_does_not_import_label_map() -> None:
     At inference the species is not known. If the app imported the lookup
     table, a developer could add a species guess to the response by accident.
     """
-    source = (REPO_ROOT / "app" / "main.py").read_text(encoding="utf-8")
-
-    assert "label_map" not in source
-    assert "LOOKUP" not in source
+    assert APP_PY_FILES, "tidak ada berkas Python di app/"
+    for path in APP_PY_FILES:
+        source = path.read_text(encoding="utf-8")
+        assert "label_map" not in source, path
+        assert "LOOKUP" not in source, path
 
 # ===========================================================================
 # Two languages and canonical data
@@ -646,9 +649,9 @@ def _dictionary_keys() -> tuple:
 
 # --- 1. the dictionary file exists and is readable -----------------------------
 def test_i18n_file_exists_and_is_readable() -> None:
-    """app/static/i18n.js must exist, be non empty, and read as two dictionaries."""
-    assert I18N_PATH.is_file(), "app/static/i18n.js tidak ada"
-    assert I18N_PATH.stat().st_size > 0, "app/static/i18n.js kosong"
+    """app/views/static/i18n.js must exist, be non empty, and read as two dictionaries."""
+    assert I18N_PATH.is_file(), "app/views/static/i18n.js tidak ada"
+    assert I18N_PATH.stat().st_size > 0, "app/views/static/i18n.js kosong"
 
     dicts = _dictionaries()
 
@@ -810,12 +813,13 @@ def test_nothing_in_the_stack_reads_accept_language() -> None:
     forbidden = re.compile(r"accept[-_]?language", re.I)
 
     checked = 0
-    for path in (
-        REPO_ROOT / "app" / "main.py",
+    targets = [
+        *APP_PY_FILES,
         MAIN_JS_PATH,
         REPO_ROOT / "Procfile",
         REPO_ROOT / "requirements.txt",
-    ):
+    ]
+    for path in targets:
         assert path.is_file(), f"{path} tidak ada"
         text = path.read_text(encoding="utf-8")
         found = forbidden.search(text)
@@ -825,7 +829,8 @@ def test_nothing_in_the_stack_reads_accept_language() -> None:
             "mengembalikan bahasa Inggris"
         )
         checked += 1
-    assert checked == 4
+    assert checked == len(targets)
+    assert len(APP_PY_FILES) >= 1
 
 
 # --- 7. the response value is identical whatever the Accept-Language header ---
@@ -867,7 +872,7 @@ def test_response_is_identical_under_any_accept_language(client: TestClient) -> 
 # --- language switcher -------------------------------------------------------
 def test_language_toggle_buttons_exist_in_the_header() -> None:
     """Two small buttons in the header, next to the existing navigation buttons."""
-    page = (STATIC_DIR / "index.html").read_text(encoding="utf-8")
+    page = (TEMPLATES_DIR / "index.html").read_text(encoding="utf-8")
 
     assert 'id="lang-en"' in page, "tombol EN tidak ada"
     assert 'id="lang-id"' in page, "tombol ID tidak ada"
@@ -953,7 +958,7 @@ def test_every_page_i18n_key_exists_in_the_dictionary() -> None:
     This is what makes a language change actually alter all static text,
     not just part of it.
     """
-    page = (STATIC_DIR / "index.html").read_text(encoding="utf-8")
+    page = (TEMPLATES_DIR / "index.html").read_text(encoding="utf-8")
     english, indonesian = _dictionary_keys()
 
     used = set(re.findall(r'data-i18n(?:-aria-label)?="([^"]+)"', page))
@@ -965,7 +970,7 @@ def test_every_page_i18n_key_exists_in_the_dictionary() -> None:
 
 def test_language_switcher_preserves_the_locked_markup() -> None:
     """The four things other tests lock must not change because of the switcher."""
-    page = (STATIC_DIR / "index.html").read_text(encoding="utf-8")
+    page = (TEMPLATES_DIR / "index.html").read_text(encoding="utf-8")
 
     assert 'id="tabs"' in page
     assert 'id="panel"' in page
