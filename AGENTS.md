@@ -1,17 +1,17 @@
 # AGENTS.md: Instructions for Agents in this Repository
 
-> **STATUS 12 Oktober 2026.** Repo ini dianggap **selesai** oleh owner.
-> Fokus pengerjaan pindah ke `BacteriaCVMobile`, yang dikerjakan dengan satu
-> sesi Codex CLI. Lihat `docs/CODEX.md`.
+> **STATUS 12 November 2026.** Pengerjaan WebApp dibuka kembali oleh owner
+> dan dikerjakan bersama Claude Code. Alur kerjanya ada di `docs/WORKFLOW.md`.
+> Lapisan web sudah direstrukturisasi menjadi MVC (lihat
+> `docs/ARCHITECTURE.md` bagian 4).
 >
-> Dokumen ini tetap berlaku sebagai rujukan keputusan, dan untuk pekerjaan
-> web di masa depan. Isinya jangan dihapus.
+> Dokumen ini tetap berlaku sebagai rujukan keputusan. Isinya jangan dihapus.
 
 ## 1. Roles
 | Agent | Tool | Role | Authority |
 |------|------|-------|------------|
 | Codex CLI | OpenAI Codex CLI | Author and auditor in one session | Writes and modifies code according to SPEC, ARCHITECTURE, DESIGN, then verifies its own work against the rules in section 4 |
-| Antigravity CLI | Antigravity IDE 1.107.0, chat mode --mode agent | Interface author | Writes and modifies app/static/index.html and docs/DESIGN.md according to DESIGN.md and after owner approval |
+| Antigravity CLI | Antigravity IDE 1.107.0, chat mode --mode agent | Interface author | Writes and modifies app/views/templates/index.html and docs/DESIGN.md according to DESIGN.md and after owner approval |
 
 Codex CLI works alone here. It writes the code and then verifies that same
 code, so it is not an independent auditor. Section 4 exists because of that,
@@ -193,7 +193,7 @@ The final report contains five sections in a fixed order:
 
 ## Catatan Prioritas
 
-Bagian 9 sampai 24 di bawah diadaptasi dari AGENTS.md proyek DoMark dan
+Bagian 9 sampai 24 di bawah diadaptasi dari AGENTS.md proyek BacteriaCV dan
 berlaku menyeluruh di repo ini. Bagian 1 sampai 8 tetap berlaku dan tidak
 diganti.
 
@@ -297,15 +297,14 @@ dan tes yang salah sasaran.
 ## 15. Dokumentasi
 
 - Dokumen sumber ada di `docs/`: `SPEC.md`, `ARCHITECTURE.md`, `DESIGN.md`,
-  `PRD.md`, `CONTEXT.md`, `CHECKPOINT.md`, dan `CODEX.md`.
+  `PRD.md`, `CONTEXT.md`, dan `WORKFLOW.md`.
 - Perbarui dokumen yang relevan ketika fitur, keputusan arsitektur, atau
   status kerja berubah.
-- `docs/CHECKPOINT.md` adalah catatan serah terima, bukan dokumen sumber
-  kebenaran. Yang berwenang tetap `SPEC.md`, `ARCHITECTURE.md`,
-  `DESIGN.md`, dan `PRD.md`.
-- Saat memperbarui `docs/CHECKPOINT.md`, pisahkan klaim yang sudah
-  diverifikasi ulang di sesi ini dari klaim yang diwarisi dari laporan
-  sebelumnya.
+- `docs/WORKFLOW.md` mengatur alur kerja, bukan sumber kebenaran produk.
+  Yang berwenang tetap `SPEC.md`, `ARCHITECTURE.md`, `DESIGN.md`, dan
+  `PRD.md`.
+- Saat melaporkan status, pisahkan klaim yang sudah diverifikasi ulang di
+  sesi ini dari klaim yang diwarisi dari laporan sebelumnya.
 - Jangan menyebut konstanta, nomor baris, atau nama simbol dari kode yang
   belum dibaca di sesi berjalan. Tulis "belum dicek" kalau memang belum.
 
@@ -354,117 +353,134 @@ dan tes yang salah sasaran.
 
 ## 19. Perencanaan dan Pelacakan
 
-- Gunakan `docs/CHECKPOINT.md` sebagai catatan serah terima yang bisa
-  berubah, bukan sebagai pengganti spesifikasi atau daftar tugas yang belum
-  disetujui.
-- Setelah rencana kerja disetujui, catat perubahan status di
-  `docs/CHECKPOINT.md` atau dokumen sumber yang sesuai.
+- Ikuti `docs/WORKFLOW.md` untuk urutan rencana, persetujuan, branch, dan
+  PR. Dokumen itu bukan pengganti spesifikasi.
+- Setelah rencana kerja disetujui, catat perubahan keputusan di dokumen
+  sumber yang sesuai.
 - Jangan mengasumsikan adanya `TODO.md`, `CHANGELOG.md`, `worklog.md`, atau
   `DEVIATIONS.md`. Kalau perlu, tanyakan dulu.
 - Pertahankan keputusan teknis dan status yang sudah ada. Jangan menimpa
   bagian dokumentasi yang tidak terkait.
 
-## 20. GitHub Issue dan Pull Request
+## GitHub Issue dan Pull Request
 
-- Sebelum implementasi, periksa dan laporkan status Git serta perubahan
-  lokal di root dan worktree yang relevan. Jangan menimpa, membuang, atau
-  memasukkan perubahan yang tidak terkait.
-- Sebelum implementasi, tampilkan rencana yang menyebut lingkup,
-  pendekatan, berkas yang diperkirakan berubah, validasi, dan risiko. Tunggu
-  persetujuan eksplisit owner sebelum membuat perubahan implementasi.
-- Setelah rencana disetujui, buat worktree dan branch khusus dari
-  `origin/main` terbaru, lalu buat satu GitHub Issue khusus untuk pekerjaan
-  itu sebelum mulai implementasi.
-- Periksa Issue dan PR terbuka yang relevan sebelum membuat item baru.
-  Hubungkan Issue dengan PR hanya kalau keduanya untuk pekerjaan yang sama.
-- Jangan membuat Issue, Pull Request, komentar, atau rilis GitHub di luar
-  alur yang sudah disetujui owner.
-- Jangan menggabungkan Pull Request. Penggabungan selalu dilakukan owner.
+- Sebelum implementasi, periksa dan laporkan status Git serta perubahan lokal di root dan worktree yang relevan. Jangan menimpa, membuang, atau memasukkan perubahan yang tidak terkait.
+- Sebelum implementasi, tampilkan rencana yang menyebut lingkup, pendekatan, berkas yang diperkirakan berubah, validasi, dan risiko. Tunggu persetujuan eksplisit user sebelum membuat perubahan implementasi.
+- Setelah rencana disetujui, buat worktree dan branch khusus dari `origin/main` terbaru. Buat satu GitHub Issue khusus untuk pekerjaan tersebut sebelum mulai implementasi.
+- Periksa Issue dan PR terbuka yang relevan sebelum membuat item baru. Gunakan judul yang menjelaskan lingkup BacteriaCV dan hubungkan Issue dengan PR hanya jika keduanya untuk pekerjaan yang sama.
+- Jangan membuat Issue, Pull Request, komentar, atau rilis GitHub di luar alur yang sudah disetujui user.
+- Jangan menggabungkan Pull Request. Penggabungan selalu dilakukan user.
 
-## 21. Branch, Worktree, dan Commit
+## Branch and Commit Rules
 
-- Buat branch implementasi hanya di worktree khusus yang dibuat dari
-  `origin/main` terbaru setelah rencana disetujui. Gunakan nama deskriptif
-  seperti `fix/resize-kontrak` atau `docs/halaman-changelog`.
-- Periksa `git status` sebelum membuat worktree, branch, staging, commit,
-  push, atau menghapus worktree. Pertahankan perubahan lokal dan berkas
-  untracked yang bukan bagian tugas.
-- Setiap commit hanya boleh berisi perubahan pada satu berkas. Kalau satu
-  tugas mengubah beberapa berkas, buat commit terpisah untuk setiap berkas.
-- Gunakan pesan Conventional Commit dengan awalan tipe seperti `feat:`,
-  `fix:`, `test:`, `docs:`, atau `chore:`, dan jelaskan perubahannya secara
-  spesifik.
-- Jangan masukkan kredensial, `.env`, log, artefak build, artefak perangkat,
-  atau perubahan format yang tidak terkait ke dalam commit.
-- Sebelum push, jalankan `git diff --check` dan validasi yang relevan sesuai
-  rencana. Laporkan validasi yang tidak dijalankan.
-- Jangan memakai perintah destruktif seperti `git reset --hard` atau
-  `git checkout --` tanpa persetujuan eksplisit owner.
-- Catatan penting: repo ini memakai squash merge. Aturan satu berkas per
-  commit terlihat di branch, tetapi setelah merge riwayat di `main` menjadi
-  satu commit. Jangan memakai kenyataan itu sebagai alasan untuk mencampur
-  perubahan yang tidak terkait.
+- Buat branch implementasi hanya di worktree khusus yang dibuat dari `origin/main` terbaru setelah rencana disetujui. Gunakan nama deskriptif seperti `fix/docx-resume-segment-rotation` atau `feat/markdown-preview`.
+- Periksa `git status` sebelum membuat worktree/branch, staging, commit, push, atau menghapus worktree. Pertahankan perubahan lokal dan berkas tak terlacak yang bukan bagian tugas.
+- Setiap commit hanya boleh berisi perubahan pada satu berkas. Jika satu tugas mengubah beberapa berkas, buat commit terpisah untuk setiap berkas.
+- Gunakan pesan Conventional Commit dengan awalan tipe, misalnya `fix:`, `feat:`, `docs:`, atau `chore:`, dan jelaskan perubahan secara spesifik.
+- Jangan masukkan secrets, `.env`, log, artefak build, berkas perangkat, atau perubahan format yang tidak terkait ke commit.
+- Sebelum push, verifikasi `git diff --check` dan jalankan validasi relevan sesuai rencana yang disetujui. Laporkan validasi yang tidak dijalankan.
+- Jangan gunakan perintah destruktif seperti `git reset --hard`, `git checkout --`, atau reset database tanpa persetujuan eksplisit.
 
-## 22. Aturan Pull Request
+## Pull Request Rules
 
-- Buat satu PR dari branch implementasi ke `main` untuk Issue dan worktree
-  yang sama.
-- Judul PR berawalan tipe yang jelas. Body PR berupa Markdown multiline
-  nyata dengan bagian: `Ringkasan`, `Perubahan`, `Validasi`, dan
-  `Dampak Data` atau `Deployment Checklist` bila relevan.
-- Tautkan Issue terkait dengan `Closes #<nomor>` atau `Fixes #<nomor>`
-  kalau PR menyelesaikan Issue itu.
-- Nyatakan apakah diperlukan migrasi data, perubahan variabel lingkungan,
-  perubahan penyimpanan, atau tindakan deployment manual.
-- Buat PR sebagai draft sampai laporan review konsolidasi tersedia dan
-  pemeriksaan relevan ditinjau.
-- Setelah PR dibuat, siapkan satu laporan Code Review berbahasa Indonesia di
-  `docs/review/CODE_REVIEW.md` di dalam worktree tersebut. Baca berkas itu
-  dulu kalau sudah ada, agar isinya tidak tertimpa tanpa sengaja.
-- Tinjau status CI sebelum menandai PR siap. Kalau tidak ada check yang
-  dikonfigurasi, laporkan secara eksplisit. Jangan menyebutnya lulus.
-- Laporkan URL Issue dan PR, nama branch, hash commit, serta hasil validasi
-  kepada owner.
-- Agent tidak boleh menggabungkan PR, sekalipun semua pemeriksaan lulus.
+- Buat satu PR dari branch implementasi ke `main` untuk Issue dan worktree yang sama.
+- Gunakan judul berawalan tipe yang jelas. Body PR harus berupa Markdown multiline nyata dengan bagian:
+  - `Ringkasan`
+  - `Perubahan`
+  - `Validasi`
+  - `Dampak Data` atau `Deployment Checklist` jika relevan
+- Tautkan Issue terkait dengan `Closes #<number>` atau `Fixes #<number>` jika PR menyelesaikan Issue itu.
+- Nyatakan apakah migrasi database, perubahan variabel lingkungan, perubahan penyimpanan, atau tindakan deployment manual diperlukan.
+- Buat PR sebagai draft sampai laporan review konsolidasi tersedia dan pemeriksaan relevan ditinjau. Setelah branch didorong, laporan tersedia, dan pemeriksaan ditinjau, PR boleh ditandai siap.
+- Laporkan URL Issue dan PR, nama branch, hash commit, serta hasil validasi kepada user.
+- Agent tidak boleh menggabungkan PR, sekalipun semua pemeriksaan lulus. Hanya user yang menggabungkan PR.
 
-## 23. Penyelesaian Worktree
+## Alur Pull Request
 
-- Setiap `.worktrees/<nama>` adalah checkout branch tersendiri. Jangan merge
-  atau cherry-pick branch worktree langsung ke branch root.
-- Satu worktree menangani satu Issue dan satu PR. Jangan gabungkan beberapa
-  worktree atau Issue ke satu PR.
-- Setelah owner menyatakan PR sudah di-merge, verifikasi status merged lewat
-  GitHub, fetch `origin/main`, dan pastikan working tree worktree bersih
-  sebelum menghapusnya dengan `git worktree remove`.
-- Jangan menghapus folder worktree secara manual atau saat PR masih terbuka.
-  Jangan menghapus branch remote kecuali owner meminta.
-- Kalau owner meminta menerapkan perubahan worktree ke root, artikan sebagai
-  membuat atau memverifikasi PR, bukan menyalin berkas langsung ke branch
-  root.
+- Setelah rencana disetujui, buat worktree khusus dari `origin/main` terbaru, lalu buat Issue khusus sebelum implementasi.
+- Implementasikan hanya lingkup yang disetujui. Commit perubahan satu berkas per commit, jalankan validasi relevan, lalu push branch.
+- Buat PR draft ke `main` dengan body berbahasa Indonesia dan tautan ke Issue yang sama.
+- Setelah PR dibuat, tinjau seluruh perubahan dan sampaikan satu laporan Code Review konsolidasi berbahasa Indonesia kepada user sesuai `docs/WORKFLOW.md`. Laporan memuat temuan, status perbaikan, validasi, dan risiko/batas verifikasi.
+- Tinjau status CI/checks dan laporan review sebelum menandai PR siap. Jika tidak ada checks yang dikonfigurasi, laporkan secara eksplisit; jangan menyebutnya lulus.
+- Jangan menyatakan PR siap sebelum branch didorong, laporan tersedia, dan hasil pemeriksaan yang relevan ditinjau.
 
-## 24. Release dan Changelog
+## Worktree Completion Rules
 
-- Hitung hanya PR yang benar-benar berstatus merged sejak GitHub Release
-  sebelumnya. PR terbuka, ditutup tanpa merge, atau digabung hanya secara
-  lokal tidak dihitung.
-- Kalau belum ada Release sebelumnya, hitung PR merged sejak awal riwayat
-  repository.
-- Saat hitungan mencapai lima PR merged, periksa changelog yang ada, seluruh
-  perubahan sejak release sebelumnya, status validasi, serta tag dan Release
-  terakhir sebelum menyiapkan release.
-- Kalau changelog belum ada atau tidak mencakup perubahan yang akan dirilis,
-  jangan mengarang riwayat. Susun ringkasan dari PR merged dan minta
-  keputusan owner.
-- Gunakan konvensi tag yang sudah ada. Repo ini memakai `vX.Y.Z` dengan
-  contoh `v1.0.0`. Buat annotated tag dan GitHub Release setelah validasi
-  relevan diperiksa.
-- Jangan mengubah versi aplikasi secara otomatis.
-- Pembuatan release setelah ambang lima PR ini adalah persetujuan tetap dari
-  owner. Jangan membuat release sebelum ambang terpenuhi.
-- Jangan menggabungkan PR untuk mencapai ambang release. Setelah release,
-  hitung ulang dari PR merged berikutnya.
-- Body Release memakai tiga heading tetap, berurutan: `Ringkasan`,
-  `Perubahan`, dan `Validasi`. Nama heading tidak boleh diganti, karena
-  halaman Changelog di situs dokumentasi menarik isi Release lewat webhook
-  dan bergantung pada bentuk ini. Ringkasan ditulis untuk pembaca, bukan
-  untuk agent.
+- Setiap `.worktrees/<name>` adalah checkout branch tersendiri. Jangan merge atau cherry-pick branch worktree langsung ke branch root.
+- Satu worktree menangani satu Issue dan satu PR tersendiri. Jangan gabungkan beberapa worktree atau Issue ke satu PR.
+- Jangan menggabungkan PR worktree. Tunggu user menggabungkannya melalui GitHub.
+- Setelah user menyatakan PR sudah di-merge, verifikasi status merged melalui GitHub dan fetch `origin/main`. Pastikan working tree worktree bersih sebelum menghapusnya dengan `git worktree remove`.
+- Jangan menghapus folder worktree secara manual atau menghapus worktree saat PR masih terbuka/belum terverifikasi merged. Jangan hapus branch remote kecuali user meminta atau aturan repo mengharuskannya.
+- Jika diminta menerapkan perubahan worktree ke root, artikan sebagai membuat/memverifikasi PR sesuai alur ini, bukan menggabungkan berkas langsung ke branch root.
+
+## Release Rules
+
+- Hitung hanya PR yang benar-benar berstatus merged sejak GitHub Release sebelumnya. PR terbuka, ditutup tanpa merge, atau hanya digabung secara lokal tidak dihitung.
+- Jika belum ada GitHub Release sebelumnya, hitung PR merged sejak awal riwayat repository.
+- Saat hitungan mencapai lima PR merged, periksa changelog yang tersedia, seluruh perubahan sejak release sebelumnya, status validasi, serta tag dan GitHub Release terakhir sebelum menyiapkan release.
+- Jika changelog belum ada atau tidak mencakup perubahan yang akan dirilis, jangan mengarang riwayat. Siapkan ringkasan dari PR merged dan minta keputusan user tentang pembaruan changelog sebelum publikasi.
+- Gunakan konvensi versi/tag repo yang sudah ada. Buat annotated Git tag dan GitHub Release yang merangkum PR merged tersebut setelah validasi relevan diperiksa. Jangan mengubah versi aplikasi secara otomatis.
+- Pembuatan release setelah ambang lima PR ini merupakan persetujuan tetap user. Jangan membuat release sebelum ambang terpenuhi atau saat changelog/validasi belum siap.
+- Jangan menggabungkan PR untuk mencapai ambang release. Penggabungan tetap dilakukan user. Setelah release, mulai hitung ulang dari PR merged berikutnya.
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+- Skill **graphify** tersedia di `.agents/skills/graphify/SKILL.md` untuk pertanyaan tentang knowledge graph. Ikuti instruksi skill tersebut saat graphify relevan.
+
+Rules:
+
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+
+## Skill Routing (WAJIB)
+
+Folder `.agents/skills/` berisi banyak skill. JANGAN membaca semua skill.
+Ikuti aturan ini untuk menghemat token:
+
+1. Sebelum mengerjakan tugas, identifikasi jenis tugas dan cocokkan dengan tabel di bawah.
+2. Baca HANYA `SKILL.md` dari skill yang cocok (maksimal 3 skill per tugas).
+3. Folder `references/` dan `examples/` dibaca hanya jika `SKILL.md` menyuruhnya dan tugas benar-benar membutuhkannya.
+4. Jika tidak ada skill yang cocok, kerjakan tanpa skill. Jangan menebak atau membaca skill lain "untuk jaga-jaga".
+5. Jangan membaca ulang skill yang sudah dibaca dalam sesi yang sama.
+6. Abaikan `differential-review/` kecuali diminta review kode/PR secara eksplisit.
+7. Skill berat (`taste-skills`, `llm-council`) hanya dipakai jika user memintanya secara eksplisit.
+
+### Tabel Routing
+
+| Jenis tugas                                     | Skill yang dibaca                                                          |
+| ----------------------------------------------- | -------------------------------------------------------------------------- |
+| Membuat/menambah unit test Dart                 | `dart-add-unit-test`                                                       |
+| Mock untuk test Dart                            | `dart-generate-test-mocks`                                                 |
+| Coverage test                                   | `dart-collect-coverage`                                                    |
+| Migrasi ke package `checks`                     | `dart-migrate-to-checks-package`                                           |
+| Error runtime Dart/Flutter                      | `dart-fix-runtime-errors`                                                  |
+| Static analysis / lint                          | `dart-run-static-analysis`                                                 |
+| Konflik dependency / pubspec                    | `dart-resolve-package-conflicts`                                           |
+| Dokumentasi kode Dart                           | `dart-write-documentation`, `dart-use-doc-examples`                        |
+| Pattern matching / primary constructor          | `dart-use-pattern-matching`, `dart-use-primary-constructors`               |
+| Manipulasi path file                            | `dart-use-path-package`                                                    |
+| FFI / native binding                            | `dart-setup-ffi-assets`, `dart-use-ffigen`                                 |
+| CLI app Dart                                    | `dart-build-cli-app`                                                       |
+| Widget test Flutter                             | `flutter-add-widget-test`                                                  |
+| Integration test Flutter                        | `flutter-add-integration-test`                                             |
+| Widget preview                                  | `flutter-add-widget-preview`                                               |
+| Arsitektur app Flutter                          | `flutter-apply-architecture-best-practices`                                |
+| Layout responsif                                | `flutter-build-responsive-layout`                                          |
+| Layout overflow / bug layout                    | `flutter-fix-layout-issues`                                                |
+| JSON serialization                              | `flutter-implement-json-serialization`                                     |
+| Routing / navigasi                              | `flutter-setup-declarative-routing`                                        |
+| Lokalisasi / i18n                               | `flutter-setup-localization`                                               |
+| HTTP / API call                                 | `flutter-use-http-package`                                                 |
+| Desain UI / UX app Flutter                      | `ui-ux-pro-max` (stack Flutter), `design-system`, `ui-styling` (pilih 1-2) |
+| Desain halaman web (HTML/CSS)                   | `frontend-design`; `taste-skills` hanya jika diminta eksplisit             |
+| UI dari gambar/screenshot                       | `image-to-code`                                                            |
+| Review kode / perubahan (diff)                  | `differential-review`                                                      |
+| Issue / project GitHub                          | `github-project-management`                                                |
+| Pertanyaan arsitektur / hubungan antar file     | `graphify` (query graph dulu, jangan baca banyak file)                     |
+| Keputusan strategis                             | `llm-council` hanya jika user menulis "council this" / "debate this"       |
+| Menulis teks/dokumentasi agar tidak terkesan AI | `stop-slop`                                                                |
+
