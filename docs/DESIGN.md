@@ -67,7 +67,7 @@ The layout follows the agreed skeleton, a single page with three main areas.
 - Logo or system name on the left.
 - Navigation menu in the middle: Upload, History, About.
 - Secondary button and main button on the right.
-- The logo comes from `app/static/logo.svg`, the favicon from `app/static/favicon.svg`. Both use the section 2 palette and do not use colours from any reference image. The favicon has no frame because at 16 pixels a black frame turns into a blob.
+- The logo comes from `app/views/static/logo.svg`, the favicon from `app/views/static/favicon.svg`. Both use the section 2 palette and do not use colours from any reference image. The favicon has no frame because at 16 pixels a black frame turns into a blob.
 - The header logo is decorative and uses an empty `alt`, because the system name is already written as text next to it. Otherwise a screen reader would read it twice.
 - The language switcher sits in the header next to the existing navigation buttons: two small buttons, EN and ID. It follows the same brutalist rules as the rest of the interface, with no border-radius and no shadow. The selected language is the active one. The choice is stored in `localStorage` under the key `bacteriacv.lang`, and English is the default when that key is absent.
 
